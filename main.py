@@ -70,16 +70,17 @@ async def main_html_context(request: Request):
 @app.get("/users/list")
 async def user_list(request: Request):
     users = [
-    {"name": "Alice", "age": 25, "city": "Seoul"},
-    {"name": "Bob", "age": 30, "city": "Busan"},
-    {"name": "Charlie", "age": 28, "city": "Daegu"}
+        {"name": "Alice", "age": 25, "city": "Seoul"},
+        {"name": "Bob", "age": 30, "city": "Busan"},
+        {"name": "Charlie", "age": 28, "city": "Daegu"}
     ]
 
     context = {
-        "request": request
-        , "user_list": users
+        "request": request,
+        "user_list": users
     }
     return templates.TemplateResponse("users/list.html", context)
+
 
 
 # 정적 파일 설정 # http://localhost:8000/images/temp.jpg
