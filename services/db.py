@@ -1,5 +1,6 @@
 import psycopg2
 from typing import Optional
+
 def get_db_connection():
     # os.getenv 사용 안 함 → 기본값을 직접 설정
     DB_HOST: Optional[str] = "db_postgresql"
@@ -7,6 +8,7 @@ def get_db_connection():
     POSTGRES_DB: Optional[str] = "main_db"
     POSTGRES_USER: Optional[str] = "admin"
     POSTGRES_PASSWORD: Optional[str] = "admin123"
+
     conn = psycopg2.connect(
         host=DB_HOST,
         port=DB_PORT,
