@@ -2,8 +2,28 @@
 
 from fastapi import FastAPI
 
+from fastapi.templating import Jinja2Templates
+from fastapi import Request
+templates = Jinja2Templates(directory="templates/")
 
 app = FastAPI() # app은 class로 판정, 함수가 안에 들어가야함.
+
+from routes.todos import router as todos_router
+app.include_router(todos_router, prefix="/todos")
+
+
+# 정적 파일 설정 # http://localhost:8000/images/temp.jpg
+from fastapi.staticfiles import StaticFiles
+
+app.mount("/images", StaticFiles(directory="resources/images"))
+app.mount("/css", StaticFiles(directory="resources/css"))
+
+templates = Jinja2Templates(directory="templates")
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+
+
+
 
 # https://localhost:8000/
 @app.get("/")
@@ -44,10 +64,6 @@ async def root_html():
     """
     return html_content
 
-from fastapi.templating import Jinja2Templates
-from fastapi import Request
-templates = Jinja2Templates(directory="templates/")
-
 # http://localhost:8000/main_html
 # http://192.168.0.145:8000/main_html
 @app.get("/shotdocs_html")
@@ -83,14 +99,6 @@ async def user_list(request: Request):
 
 
 
-# 정적 파일 설정 # http://localhost:8000/images/temp.jpg
-from fastapi.staticfiles import StaticFiles
-
-app.mount("/images", StaticFiles(directory="resources/images"))
-app.mount("/css", StaticFiles(directory="resources/css"))
-
-templates = Jinja2Templates(directory="templates")
-app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @app.get("/jinja")
 async def jinja_example(request: Request):
@@ -104,6 +112,39 @@ async def jinja_example(request: Request):
         "10_jinja2.html",
         {"request": request, "products": products}
     )
+
+# http://localhost:8000/board/detail_json?title=Third%20Post&content=This%20is%20the%20third%20post
+@app.get("/board/detail_json")
+async def mode_details_json(request:Request):
+    # request.method
+    # request.query_params
+    params = dict(request.query_params)
+    # return = {"title : "Third Post", "content": "This is the third post."}
+    return {"title": params['title'], "content": params['content']}
+
+# http://localhost:8000/board/detail_json?title=Third%20Post&content=This%20is%20the%20third%20post.
+@app.post("/board/detail_post_json")
+async def board_details_post_json(request : Request) : # request = Requset()
+    # request.method
+    # request.query_params
+    params = dict(await request.form())
+
+    # return {"title" : "Third Post", "content" : "This is the third post."}
+    return {"title" : params['title'], "content" : params['content']}
+
+# http://localhost:8000/board/detail_html/{detail_id}
+@app.get("/board/detail_html/{detail_id}")
+async def main_html(request: Request, detail_id):
+    return templates.TemplateResponse("boards/detail.html"
+                                      , {"request": request})
+
+
+# http://localhost:8000/board/detail_html
+@app.get("/board/detail_html")
+async def main_html(request: Request):
+    return templates.TemplateResponse("boards/detail.html"
+                                      , {"request": request})
+
 
 
 pass
